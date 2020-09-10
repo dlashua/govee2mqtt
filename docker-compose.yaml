@@ -1,0 +1,8 @@
+version: "3.4"
+services:
+  govee2mqtt:
+    image: dlashua/govee2mqtt:latest
+    container_name: govee2mqtt
+    restart: unless-stopped
+    volumes:
+      - "/data/govee2mqtt:/config"

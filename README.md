@@ -9,10 +9,9 @@ A few notes:
 * Govee's API is SLOW. Not only does each request take longer than it should, it takes, sometimes, 3 to 4 seconds for the command to reach the light strip. Hopefully, they'll speed this up as time goes on.
 * I only have model H6159. I've not tested with anything else though, in theory, it should work.
 * Support is there for power on/off, brightness, and rgb_color. White Temperature is next in my list.
-* Dockerfile is coming soon.
 
 # Getting Started
-
+## Direct Install
 ```bash
 git clone https://github.com/dlashua/govee2mqtt.git
 cd govee2mqtt
@@ -21,6 +20,12 @@ cp config.yaml.sample config.yaml
 vi config.yaml
 python3 ./app.py -c ./
 ```
+
+## Docker
+For `docker-compose`, use the [configuration included](https://github.com/dlashua/govee2mqtt/blob/master/docker-compose.yaml) in this repository.
+
+An docker image is available at `dlashua/govee2mqtt:latest`. Mount your configuration volume at `/config`.
+
 
 # Getting an API KEY
 * Open the Govee App
