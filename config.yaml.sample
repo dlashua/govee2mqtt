@@ -1,0 +1,10 @@
+mqtt:
+  host: 10.10.10.1
+  port: 1883
+  username: govee
+  password: password
+  prefix: govee
+  homeassistant: homeassistant
+
+govee:
+  api_key: xxx

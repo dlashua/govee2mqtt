@@ -1,0 +1,5 @@
+PyYAML
+paho-mqtt
+asyncio
+requests
+
