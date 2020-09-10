@@ -160,7 +160,6 @@ class GoveeMqtt(object):
             if device['controllable'] is True:
                 first = False
                 if device_id not in self.devices:
-                    _LOGGER.debug('first time seeing {}'.format(device_id))
                     first = True
                     self.devices[device_id] = {}
                     self.devices[device_id]['model'] = device['model']
@@ -169,6 +168,7 @@ class GoveeMqtt(object):
                 self.devices[device_id]['supported_commands'] = device['supportCmds']
 
                 if first:
+                    _LOGGER.info('NEW DEVICE {} ({})'.format(self.devices[device_id]['name'],device_id))
                     self.homeassistant_config(device_id)
 
                 _LOGGER.debug('saw {}'.format(device_id))
@@ -243,7 +243,7 @@ class GoveeMqtt(object):
         for key in cmd:
             if not first:
                 time.sleep(1)
-            _LOGGER.debug('sending {} {} {} {}'.format(device_id, model, key, cmd[key]))
+            _LOGGER.info('TO DEVICE {} ({}) {} = {}'.format(self.devices[device_id]['name'], device_id, key, cmd[key]))
             self.goveec.send_command(device_id, model, key, cmd[key])
             first = False
 
@@ -254,7 +254,8 @@ class GoveeMqtt(object):
     def publish_handler(self, device_id, attribute, value):
         self.mqttc.publish(self.get_pub_topic(device_id, attribute), json.dumps(value), retain=True)
         self.devices[device_id][attribute] = value
-        _LOGGER.debug("Published {}: {} = {}".format(device_id, attribute, value))
+        name = self.devices[device_id]['name']
+        _LOGGER.info("UPDATE: {} ({}): {} = {}".format(name, device_id, attribute, value))
 
     def publish_state_handler(self, device_id):
         self.mqttc.publish(self.get_state_topic(device_id), json.dumps(self.devices[device_id]), retain=True)
