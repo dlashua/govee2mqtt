@@ -53,13 +53,13 @@ class GoveeMqtt(object):
     ################################
     def mqtt_on_connect(self, client, userdata, flags, rc):
         if rc != 0:
-            _LOGGER.info("MQTT Connection Issue")
+            _LOGGER.debug("MQTT Connection Issue")
             exit()
-        _LOGGER.info('MQTT CONNECTED')
+        _LOGGER.debug('MQTT CONNECTED')
         client.subscribe(self.get_sub_topic())
 
     def mqtt_on_disconnect(self, client, userdata, rc):
-        _LOGGER.info("MQTT Disconnected")
+        _LOGGER.debug("MQTT Disconnected")
         if time.time() > self.mqtt_connect_time + 10:
             self.mqttc_create()
         else:
@@ -69,12 +69,12 @@ class GoveeMqtt(object):
         topic = msg.topic
         payload = json.loads(msg.payload)
         device_id = topic[(len(self.mqtt_config['prefix']) + 1):-4]
-        _LOGGER.info('got a message {}: {}'.format(device_id, payload))
+        _LOGGER.debug('got a message {}: {}'.format(device_id, payload))
 
         self.send_command(device_id, payload)
 
     def mqtt_on_subscribe(self, *args, **kwargs):
-        _LOGGER.info('subscribed')
+        _LOGGER.debug('subscribed')
 
 
     # Topic Helpers
@@ -105,7 +105,7 @@ class GoveeMqtt(object):
             username=self.mqtt_config.get("username"),
             password=self.mqtt_config.get("password"),
         )
-        _LOGGER.info("CALLING MQTT CONNECT")
+        _LOGGER.debug("CALLING MQTT CONNECT")
         self.mqttc.on_connect = self.mqtt_on_connect
         self.mqttc.on_disconnect = self.mqtt_on_disconnect
         self.mqttc.on_message = self.mqtt_on_message
@@ -160,7 +160,7 @@ class GoveeMqtt(object):
             if device['controllable'] is True:
                 first = False
                 if device_id not in self.devices:
-                    _LOGGER.info('first time seeing {}'.format(device_id))
+                    _LOGGER.debug('first time seeing {}'.format(device_id))
                     first = True
                     self.devices[device_id] = {}
                     self.devices[device_id]['model'] = device['model']
@@ -171,11 +171,11 @@ class GoveeMqtt(object):
                 if first:
                     self.homeassistant_config(device_id)
 
-                _LOGGER.info('saw {}'.format(device_id))
+                _LOGGER.debug('saw {}'.format(device_id))
             else:
-                _LOGGER.info('saw but not controlable {}'.format(device_id))
+                _LOGGER.debug('saw but not controlable {}'.format(device_id))
 
-        _LOGGER.info(self.devices)
+        _LOGGER.debug(self.devices)
 
     def refresh_all_devices(self):
         for device_id in self.devices:
@@ -189,14 +189,14 @@ class GoveeMqtt(object):
     def refresh_device(self, device_id):
         model = self.devices[device_id]['model']
         data = self.goveec.get_device(device_id, model)
-        _LOGGER.info('original data {} {}'.format(device_id, data))
+        _LOGGER.debug('original data {} {}'.format(device_id, data))
 
         self.publish_attributes(device_id, data)
 
     def publish_attributes(self, device_id, orig_data):
         changed = False
         data = self.convert_mqtt_from_govee(orig_data)
-        _LOGGER.info('converted data {} {}'.format(device_id, data))
+        _LOGGER.debug('converted data {} {}'.format(device_id, data))
         for attribute in data:
             if attribute not in self.devices[device_id] or self.devices[device_id][attribute] != data[attribute]:
                 changed = True
@@ -230,7 +230,7 @@ class GoveeMqtt(object):
     def send_command(self, device_id, data):
         cmd = self.convert_govee_from_mqtt(data)
 
-        _LOGGER.info('command {} = {}'.format(device_id, cmd))
+        _LOGGER.debug('command {} = {}'.format(device_id, cmd))
         model = self.devices[device_id]['model']
 
         if 'brightness' in cmd and 'turn' in cmd:
@@ -243,7 +243,7 @@ class GoveeMqtt(object):
         for key in cmd:
             if not first:
                 time.sleep(1)
-            _LOGGER.info('sending {} {} {} {}'.format(device_id, model, key, cmd[key]))
+            _LOGGER.debug('sending {} {} {} {}'.format(device_id, model, key, cmd[key]))
             self.goveec.send_command(device_id, model, key, cmd[key])
             first = False
 
@@ -254,11 +254,11 @@ class GoveeMqtt(object):
     def publish_handler(self, device_id, attribute, value):
         self.mqttc.publish(self.get_pub_topic(device_id, attribute), json.dumps(value), retain=True)
         self.devices[device_id][attribute] = value
-        _LOGGER.info("Published {}: {} = {}".format(device_id, attribute, value))
+        _LOGGER.debug("Published {}: {} = {}".format(device_id, attribute, value))
 
     def publish_state_handler(self, device_id):
         self.mqttc.publish(self.get_state_topic(device_id), json.dumps(self.devices[device_id]), retain=True)
-        _LOGGER.info("Published {}: {}".format(device_id, self.devices[device_id]))
+        _LOGGER.debug("Published {}: {}".format(device_id, self.devices[device_id]))
         if device_id in self.boosted:
             self.boosted.remove(device_id)
 

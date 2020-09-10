@@ -8,3 +8,5 @@ mqtt:
 
 govee:
   api_key: xxx
+
+debug: False

@@ -4,8 +4,7 @@ import govee_mqtt
 
 import logging
 
-logging.basicConfig(level=logging.INFO)
-_LOGGER = logging.getLogger(__name__)
+
 
 argparser = argparse.ArgumentParser()
 argparser.add_argument(
@@ -23,4 +22,10 @@ if not configdir.endswith("/"):
 with open(configdir + "config.yaml") as file:
     config = yaml.load(file, Loader=yaml.FullLoader)
 
+if 'debug' in config and config['debug'] is True:
+    logging.basicConfig(level=logging.DEBUG)
+else:
+    logging.basicConfig(level=logging.INFO)
+
+logging.info('Starting Application')
 govee_mqtt.GoveeMqtt(config)

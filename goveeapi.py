@@ -40,7 +40,7 @@ class GoveeAPI(object):
 
 
     def get_device_list(self):
-        _LOGGER.info('getting devices list')
+        _LOGGER.debug('getting devices list')
         headers = self.get_headers()
 
         r = requests.get('https://developer-api.govee.com/v1/devices', headers=headers)
@@ -50,7 +50,7 @@ class GoveeAPI(object):
             _LOGGER.error('ERROR GETTING DEVICE LIST')
             return {}
 
-        _LOGGER.info(data)
+        _LOGGER.debug(data)
         return data['data']
 
  
@@ -73,4 +73,4 @@ class GoveeAPI(object):
 
         headers = self.get_headers()
         r = requests.put('https://developer-api.govee.com/v1/devices/control', headers=headers, data=json.dumps(data))
-        _LOGGER.info(r)
+        _LOGGER.debug(r)
