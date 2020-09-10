@@ -19,9 +19,8 @@ class GoveeAPI(object):
             'model': model
         }
 
-        r = requests.get('https://developer-api.govee.com/v1/devices/state', headers=headers, params=params)
-
         try:
+            r = requests.get('https://developer-api.govee.com/v1/devices/state', headers=headers, params=params)
             data = r.json()
         except:
             _LOGGER.error('ERROR GETTING DEVICE {}'.format(device_id))
@@ -43,8 +42,8 @@ class GoveeAPI(object):
         _LOGGER.debug('getting devices list')
         headers = self.get_headers()
 
-        r = requests.get('https://developer-api.govee.com/v1/devices', headers=headers)
         try:
+            r = requests.get('https://developer-api.govee.com/v1/devices', headers=headers)
             data = r.json()
         except:
             _LOGGER.error('ERROR GETTING DEVICE LIST')
@@ -72,5 +71,9 @@ class GoveeAPI(object):
         }
 
         headers = self.get_headers()
-        r = requests.put('https://developer-api.govee.com/v1/devices/control', headers=headers, data=json.dumps(data))
+        try:
+            r = requests.put('https://developer-api.govee.com/v1/devices/control', headers=headers, data=json.dumps(data))
+        except:
+            _LOGGER.error('ERROR SENDING DEVICE COMMAND')
+            
         _LOGGER.debug(r)
