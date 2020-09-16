@@ -21,6 +21,9 @@ class GoveeAPI(object):
 
         try:
             r = requests.get('https://developer-api.govee.com/v1/devices/state', headers=headers, params=params)
+            if r.status_code >= 400:
+                _LOGGER.error('BAD RESPONSE CODE GETTING DEVICE {}'.format(device_id))
+                return {}
             data = r.json()
         except:
             _LOGGER.error('ERROR GETTING DEVICE {}'.format(device_id))
@@ -44,6 +47,9 @@ class GoveeAPI(object):
 
         try:
             r = requests.get('https://developer-api.govee.com/v1/devices', headers=headers)
+            if r.status_code >= 400:
+                _LOGGER.error('BAD RESPONSE CODE GETTING DEVICE LIST')
+                return {}
             data = r.json()
         except:
             _LOGGER.error('ERROR GETTING DEVICE LIST')
@@ -73,6 +79,9 @@ class GoveeAPI(object):
         headers = self.get_headers()
         try:
             r = requests.put('https://developer-api.govee.com/v1/devices/control', headers=headers, data=json.dumps(data))
+            if r.status_code >= 400:
+                _LOGGER.error('BAD RESPONSE CODE SENDING COMMAND {} {}'.format(device_id, data))
+                return {}
         except:
             _LOGGER.error('ERROR SENDING DEVICE COMMAND')
             

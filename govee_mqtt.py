@@ -27,9 +27,9 @@ class GoveeMqtt(object):
 
         self.goveec = goveeapi.GoveeAPI(self.govee_config['api_key'])
 
-        self.device_update_interval = 30
-        self.device_update_boosted_interval = 0.5
-        self.device_list_update_interval = 300
+        self.device_update_interval = config['govee'].get('device_interval', 30)
+        self.device_update_boosted_interval = config['govee'].get('device_boost_interval', 5)
+        self.device_list_update_interval = config['govee'].get('device_list_interval', 300)
 
         self.mqtt_from_govee_field_map = {
             'state': ['powerState', lambda x: 'ON' if x == 'on' else 'OFF'],
